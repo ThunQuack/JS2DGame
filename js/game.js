@@ -107,35 +107,39 @@ for(let key in sprites){
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw the background
+    ctx.drawImage(sprites.background, 0, 0, canvas.width, canvas.height);
+
+    // Move platforms and collectibles
     platforms.forEach(p => p.x -= gameSpeed);
     collectibles.forEach(c => c.x -= gameSpeed);
 
+    // Remove off-screen platforms and collectibles
     platforms = platforms.filter(p => p.x + p.width > 0);
     collectibles = collectibles.filter(c => c.x > 0);
 
-    if (platforms[platforms.length - 1].x < canvas.width - 200) {
-        generatePlatform();
-    }
+    // Generate new platforms if needed
+    if (platforms[platforms.length - 1].x < canvas.width - 200) generatePlatform();
 
-    ground.draw(ctx);
+    // Draw the ground using the ground sprite
+    ctx.drawImage(sprites.ground, ground.x, ground.y, ground.width, ground.height);
 
-    ctx.fillStyle = 'brown';
-    platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
+    // Draw platforms using the platform sprite
+    platforms.forEach(p => ctx.drawImage(sprites.platform, p.x, p.y, p.width, p.height));
 
+    // Draw collectibles and check for collisions
     collectibles.forEach(c => {
-        if (c.checkCollision(player)) {
-            score += 10;
-        }
+        if (c.checkCollision(player)) score += 10;
         c.draw(ctx);
     });
 
-    // Update the player with the new update method
+    // Update and draw the player
     player.update(canvas, platforms, keys);
     player.draw(ctx, sprites);
 
+    // Update the score display
     scoreDisplay.textContent = `Score: ${score}`;
 
+    // Request the next animation frame
     requestAnimationFrame(gameLoop);
 }
-
-//gameLoop();
